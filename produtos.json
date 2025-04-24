@@ -1,0 +1,21 @@
+[ {
+  "code" : "101",
+  "name" : "Banana",
+  "precokg" : 5.0,
+  "preco" : 0.0
+}, {
+  "code" : "102",
+  "name" : "Uva",
+  "precokg" : 3.0,
+  "preco" : 0.0
+}, {
+  "code" : "103",
+  "name" : "Trakinas",
+  "precokg" : 0.0,
+  "preco" : 20.0
+}, {
+  "code" : "104",
+  "name" : "jennyfer",
+  "precokg" : 100.0,
+  "preco" : 100.0
+} ]
