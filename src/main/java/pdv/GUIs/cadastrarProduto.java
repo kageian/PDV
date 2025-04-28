@@ -90,17 +90,37 @@ public class cadastrarProduto extends JFrame {
 
     private void cadastrar() {
         try {
-            Produtos novoProduto = new Produtos();
-
             String codigo = codigoField.getText();
             String nome = nomeField.getText();
-            double precoKg = Double.parseDouble(precoKgField.getText().replace(",", ".").trim());
-            double preco = Double.parseDouble(precoField.getText().trim().replace(",", "."));
+            String precokgText = precoKgField.getText();
+            String precoText = precoField.getText();
 
+            if (codigo.isEmpty() || nome.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Todos os Campos devem ser preenchidos");
+                return;
+            }
+            double preco;
+            double precokg;
+
+            if (precoText.isEmpty()) {
+                preco = 0;
+            } else {
+                preco = Double.parseDouble(precoField.getText().trim().replace(",", "."));
+            }
+
+            if (precokgText.isEmpty()) {
+                precokg = 0;
+            } else {
+                precokg = Double.parseDouble(precoKgField.getText().replace(",", ".").trim());
+            }
+
+
+            Produtos novoProduto = new Produtos();
+            novoProduto.setPrecokg(precokg);
+            novoProduto.setPreco(preco);
             novoProduto.setName(nome);
             novoProduto.setCode(codigo);
-            novoProduto.setPreco(preco);
-            novoProduto.setPrecokg(precoKg);
+
 
             // Ajuda a ler e escrever arquivos json e transformar em json também
             ObjectMapper mapper = new ObjectMapper();
@@ -126,6 +146,7 @@ public class cadastrarProduto extends JFrame {
                     produtos.getCode().equalsIgnoreCase(novoProduto.getCode()) ||
                             produtos.getName().equalsIgnoreCase(novoProduto.getName())
             );
+
 
             if (produtoExiste) {
                 JOptionPane.showMessageDialog(this, "Já existe um produto com esse nome ou código!");

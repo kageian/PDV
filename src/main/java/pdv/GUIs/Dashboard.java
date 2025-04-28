@@ -6,8 +6,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,6 +21,9 @@ public class Dashboard extends JFrame {
     JTextField codigoField, qtdField, valorPagoField;
     JTextArea areaProdutos;
     JScrollPane scroll;
+    JButton modos;
+
+    private boolean isdarkmode;
     private double total = 0;
     private static final String CAMINHO_JSON = "produtos.json";
 
@@ -26,12 +32,12 @@ public class Dashboard extends JFrame {
             if (this.codigoField != null) {
                 codigoField.setText("");
                 areaProdutos.setText("");
-                lbPrecoNum.setText("");
-                lbPrecoKgNum.setText("");
+                lbPrecoNum.setText("0");
+                lbPrecoKgNum.setText("0");
                 qtdField.setText("");
                 valorPagoField.setText("");
-                lbTrocoNum.setText("");
-                lbTotal.setText("");
+                lbTrocoNum.setText("0");
+                lbTotal.setText("0");
 
 
             } else {
@@ -52,6 +58,14 @@ public class Dashboard extends JFrame {
         setUndecorated(true);
         setLayout(null);
 
+        setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 50, 50));
+        //icones
+
+        ImageIcon iconeluaoriginal = new ImageIcon("src/main/java/pdv/assets/lua.png");
+
+        Image imagemlua = iconeluaoriginal.getImage();
+        Image iconeluaredimensionada = imagemlua.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon iconelua = new ImageIcon(iconeluaredimensionada);
 
         BufferedImage imglogo = null;
         try {
@@ -60,10 +74,11 @@ public class Dashboard extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Font fonteTexto = new Font("Arial", Font.PLAIN, 25);
+
+        Font fonteTexto = new Font("Arial", Font.PLAIN, 24);
         Font fonteLabel = new Font("Arial", Font.PLAIN, 20);
-        Font fonteDireitos = new Font("Arial", Font.PLAIN, 30);
-        Font fonteResultados = new Font("Arial", Font.BOLD, 35);
+        Font fonteDireitos = new Font("Arial", Font.PLAIN, 29);
+        Font fonteResultados = new Font("Arial", Font.BOLD, 34);
 
         //LABELS
         JLabel imageLogo = new JLabel();
@@ -77,7 +92,7 @@ public class Dashboard extends JFrame {
         lbCodigo.setBounds(325, 150, 100, 30);
         lbCodigo.setFont(fonteLabel);
 
-        lbPreco = new JLabel("Preco");
+        lbPreco = new JLabel("Preço");
         lbPreco.setBounds(326, 250, 85, 30);
         lbPreco.setFont(fonteLabel);
 
@@ -115,11 +130,11 @@ public class Dashboard extends JFrame {
         lbTotal.setFont(fonteDireitos);
 
         lbValorTotal = new JLabel("Valor Pago R$");
-        lbValorTotal.setBounds(760, 480, 300, 45);
+        lbValorTotal.setBounds(730, 480, 300, 45);
         lbValorTotal.setFont(fonteDireitos);
 
         lbTroco = new JLabel("Troco R$");
-        lbTroco.setBounds(1050, 480, 200, 45);
+        lbTroco.setBounds(1055, 480, 200, 45);
         lbTroco.setFont(fonteDireitos);
 
         lbTrocoNum = new JLabel("0");
@@ -132,6 +147,7 @@ public class Dashboard extends JFrame {
 
         scroll = new JScrollPane(areaProdutos);
         scroll.setBounds(650, 70, 700, 410);
+
 
         add(scroll);
         add(lbPrecoReal);
@@ -157,15 +173,6 @@ public class Dashboard extends JFrame {
         codigoField.setBounds(323, 180, 300, 30);
         codigoField.setFont(fonteTexto);
 
-//        precoField = new JTextField();
-//        precoField.setBounds(323, 280, 300, 30);
-//        precoField.setFont(fonteTexto);
-//
-//        precoKgField = new JTextField();
-//        precoKgField.setBounds(323, 380, 300, 30);
-//        precoKgField.setFont(fonteTexto);
-
-
         qtdField = new JTextField();
         qtdField.setBounds(323, 480, 300, 30);
         qtdField.setFont(fonteTexto);
@@ -184,16 +191,24 @@ public class Dashboard extends JFrame {
 
 
         JButton sair = new JButton("x");
-        sair.setBounds(1316, 0, 50, 50);
+        sair.setBounds(1290, 0, 50, 50);
         sair.setFont(new Font("Arial", Font.BOLD, 40));
         sair.setForeground(new Color(168, 19, 19));
         sair.setBackground(new Color(0x000000));
 
         JButton voltar = new JButton("<");
-        voltar.setBounds(1250, 0, 50, 50);
+        voltar.setBounds(1200, 0, 50, 50);
         voltar.setFont(new Font("Arial", Font.BOLD, 30));
         voltar.setForeground(new Color(18, 73, 154));
         voltar.setBackground(new Color(0x000000));
+
+        modos = new JButton();
+        modos.setBounds(230, 30, 50, 50);
+        modos.setIcon(iconelua);
+        modos.setHorizontalAlignment(SwingConstants.CENTER);
+        modos.setVerticalAlignment(SwingConstants.CENTER);
+        modos.setBackground(new Color(0, 0, 0, 0));
+
 
         // Atalhos do teclado
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F1"), "abrirTela");
@@ -222,6 +237,8 @@ public class Dashboard extends JFrame {
 
         add(sair);
         add(voltar);
+        add(modos);
+        modos.addActionListener(this::toggle);
         sair.addActionListener(this::Sair);
         voltar.addActionListener(this::Voltar);
 
@@ -249,6 +266,8 @@ public class Dashboard extends JFrame {
 
                 File arquivo = new File(CAMINHO_JSON);
                 try {
+
+                    // Transforma um json em lista
                     ObjectMapper mapper = new ObjectMapper();
                     Produtos[] produtosArray = mapper.readValue(arquivo, Produtos[].class);
                     List<Produtos> produtos = Arrays.asList(produtosArray);
@@ -351,6 +370,61 @@ public class Dashboard extends JFrame {
 
     private void Sair(ActionEvent actionEvent) {
         dispose();
+
+    }
+
+    private void trocardeCor() {
+
+        Color labels = isdarkmode ? new Color(255, 255, 255, 255) : new Color(40, 42, 54);
+        Color fields = isdarkmode ? new Color(255, 255, 255, 255) : new Color(40, 42, 54);
+        Color backgroundcolor = isdarkmode ? new Color(40, 42, 54, 255) : new Color(255, 255, 255);
+
+        getContentPane().setBackground(backgroundcolor);
+        lbTotal.setForeground(labels);
+        lbValorTotal.setForeground(labels);
+        lbQTD.setForeground(labels);
+        lbTrocoNum.setForeground(labels);
+        lbTroco.setForeground(labels);
+        lbQTD.setForeground(labels);
+        lbPrecoReal.setForeground(labels);
+        lbPreco.setForeground(labels);
+        lbPrecoKgNum.setForeground(labels);
+        lbPrecoKg.setForeground(labels);
+        lbPrecoNum.setForeground(labels);
+        lbNome.setForeground(labels);
+        lbCodigo.setForeground(labels);
+        lbPrecoKgReal.setForeground(labels);
+        lbPrecoTotal.setForeground(labels);
+
+        codigoField.setForeground(fields);
+        valorPagoField.setForeground(fields);
+        qtdField.setForeground(fields);
+        codigoField.setBackground(backgroundcolor);
+        valorPagoField.setBackground(backgroundcolor);
+        qtdField.setBackground(backgroundcolor);
+
+
+        areaProdutos.setBackground(backgroundcolor);
+        areaProdutos.setForeground(fields);
+
+
+    }
+
+    private void toggle(ActionEvent actionEvent) {
+        isdarkmode = !isdarkmode;
+        ImageIcon iconesoloriginal = new ImageIcon("src/main/java/pdv/assets/sun-512.png");
+        Image iconesolpegar = iconesoloriginal.getImage();
+        Image iconesolredimensionada = iconesolpegar.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon iconesol = new ImageIcon(iconesolredimensionada);
+        ImageIcon iconeluaoriginal = new ImageIcon("src/main/java/pdv/assets/lua.png");
+
+        Image imagemlua = iconeluaoriginal.getImage();
+        Image iconeluaredimensionada = imagemlua.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon iconelua = new ImageIcon(iconeluaredimensionada);
+
+        modos.setIcon(isdarkmode ? iconesol : iconelua);
+        trocardeCor();
+
 
     }
 
