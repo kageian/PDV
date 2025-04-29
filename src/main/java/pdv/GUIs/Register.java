@@ -142,7 +142,7 @@ public class Register extends JFrame {
                 String email = emailField.getText();
 
 
-                //Validando os inputs
+                //Validando os inputs.
                 if (validateUserInput(username, password, confirmarPassword, email)) {
 
                     if (MyJDBC.register(username, password, email)) {
@@ -150,6 +150,7 @@ public class Register extends JFrame {
 
                         Register.this.dispose();
                         Login login = new Login();
+
                         login.setVisible(true);
 
 
