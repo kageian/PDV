@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,6 +140,7 @@ public class cadastrarProduto extends JFrame {
             } else {
                 listaProdutos = new ArrayList<>();
                 System.out.println("Criou uma lista para colocar novos produtos");
+                System.out.println();
             }
             // Verifica se já existe produto com mesmo nome ou código
             // Produtos é os produtos ja cadastrados na minha lista e novoProduto foi o que eu digitei
