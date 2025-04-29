@@ -198,7 +198,7 @@ public class Login extends JFrame implements ActionListener {
     }
 
 
-        //Colocar para todos os botões que n recebem um metodo proprio receba esta função
+        //Colocar para todos os botões que n recebem um metodo proprio receba esta função.
         @Override
         public void actionPerformed (ActionEvent e){
             JOptionPane.showMessageDialog(null, "Erro ai inicializar", "Erro", JOptionPane.ERROR_MESSAGE);
