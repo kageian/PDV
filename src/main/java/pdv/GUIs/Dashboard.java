@@ -38,6 +38,7 @@ public class Dashboard extends JFrame {
                 valorPagoField.setText("");
                 lbTrocoNum.setText("0");
                 lbTotal.setText("0");
+                System.out.println("Produtos resetados com sucesso");
 
 
             } else {
