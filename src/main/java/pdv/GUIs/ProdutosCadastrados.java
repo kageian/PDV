@@ -30,6 +30,7 @@ public class ProdutosCadastrados extends JFrame {
                 for (Produtos p : produtos) {
                     if (codigoProduto.equals(p.getCode())) {
                         produtopararemover = p;
+                        System.out.println("Produto Removido: "+produtopararemover);
                         break;
                     }
                 }
