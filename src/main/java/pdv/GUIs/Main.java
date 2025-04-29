@@ -13,7 +13,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        new cadastrarProduto().setVisible(true);
+        new Login().setVisible(true);
         //Test para ver se o usuario esta ou não na db
 //        System.out.println(MyJDBC.checkUser("username12"));
 
